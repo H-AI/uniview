@@ -1,0 +1,1 @@
+docker build container -f container/Dockerfile.base -t ubuntu18:py38

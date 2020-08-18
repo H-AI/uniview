@@ -1,0 +1,18 @@
+FROM ubuntu:18.04
+
+USER root
+ARG WORKPATH=/home
+WORKDIR $WORKPATH
+
+####### prep. cpu environment ######
+COPY installers/apt_install.sh ${WORKPATH}/
+RUN bash apt_install.sh && rm apt_install.sh
+####### cpu environment end ######
+
+####### python 3.8 build from source ######
+ARG PYTHON_VERSION_TAG=3.8.3
+ARG LINK_PYTHON_TO_PYTHON3=1
+COPY installers/install_python.sh install_python.sh
+RUN bash install_python.sh ${PYTHON_VERSION_TAG} ${LINK_PYTHON_TO_PYTHON3} && \
+    rm -r install_python.sh Python-${PYTHON_VERSION_TAG}
+####### python installation end ######
