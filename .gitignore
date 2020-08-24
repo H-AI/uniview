@@ -1,8 +1,12 @@
 .vscode/
 __pycache__
+.mypy_cache
+.pytest_cache
 *.pyc
 .DS_Store
+dist/
 legacy/
 .idea
+.coverage
 venv/
 test_data/
