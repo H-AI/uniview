@@ -1,0 +1,32 @@
+repos:
+-   repo: https://github.com/ambv/black
+    rev: stable
+    hooks:
+    - id: black
+      language_version: python3.8
+      exclude: 'protobuf'
+-   repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.0
+    hooks:
+    - id: flake8
+      args: ['--ignore=E203, E266, E231, E402, W503, W605, F403']
+      exclude: 'protobuf'
+-   repo: local
+    hooks:
+    - id: tests
+      name: run tests
+      stages: [commit]
+      language: system
+      entry: pytest -v
+      types: [python]
+      verbose: true
+      pass_filenames: false
+      always_run: true
+    - id: pytest-cov
+      name: run pytest converage plugin
+      stages: [push]
+      language: system
+      entry: pytest --cov=tests --cov-fail-under=100
+      types: [python]
+      pass_filenames: false
+      exclude: setup.py
