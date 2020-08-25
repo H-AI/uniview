@@ -8,16 +8,8 @@ sys.path.append(str(proj_root))
 import cv2
 import json
 
-# from tools.visualization.im2d_viz_utils import draw_boxes, vis_keypoints
-
-
-# def demo_example(im, bboxes, cats=None, kps=[], resize=1.0):
-#     bboxes = [nbbx_2_ncornerbox(b) for b in bboxes]
-#     im = draw_boxes(im, bboxes, cats)
-#     im = vis_keypoints(im, kps)
-#     if resize != 1.0:
-#         im = cv2.resize(im, (0, 0), fx=resize, fy=resize)
-#     return im
+from uniview.IM2D.bbox import UnviewBBox
+from uniview.IM2D import coco_person as cp
 
 
 def main(_argv):
@@ -31,10 +23,27 @@ def main(_argv):
     print(type(mini_coco))
 
     # try demo functions
+    """ annotation keys:
+    ['segmentation', 'num_keypoints', 'area', 'iscrowd', 'keypoints',
+     'image_id', 'bbox', 'category_id', 'id'] """
+
+    unibox = UnviewBBox()
+
     for imf, annotations in mini_coco.items():
+        print(f"---------- {imf} ------------")
         im = cv2.imread(str(home / imf))
         print(im.shape)
         print(type(im.shape))
+        bboxes, keypoints = [], []
+        for inst in annotations:
+            bboxes.append(inst["bbox"])
+            keypoints.append(inst["keypoints"])
+        bboxes = unibox.get_albu_bbox(bboxes, "coco", im.shape)
+
+        im = cp.draw_boxes(im, bboxes)
+        im = cp.vis_keypoints(im, keypoints)
+        cv2.imshow("example", im)
+        cv2.waitKey(0)
 
 
 if __name__ == "__main__":
