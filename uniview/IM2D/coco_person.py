@@ -261,6 +261,7 @@ def vis_keypoints(
                        list of (x, y, v) keypoints.
                    3). ndarray of shape [n_instance, n_keypoints, 3]
                    4). list of ndarray of shape [n_keypoints, 3]
+                   5). list of list of tuples in (x, y)
         diameter: radius of keypoint circle
     Returns:
         np.ndarray
@@ -269,13 +270,17 @@ def vis_keypoints(
     keypoints = np.array(keypoints)
     if len(keypoints.shape) == 2 and keypoints.shape[1] % 3 == 0:
         keypoints = keypoints.reshape((keypoints.shape[0], -1, 3))
-    if len(keypoints.shape) == 3 and keypoints.shape[2] == 3:
+    if len(keypoints.shape) == 3:
         n_inst, n_kps, _ = keypoints.shape
         for i in range(n_inst):
             for j in range(n_kps):
-                x, y, v = keypoints[i, j, :]
-                if v > 1:
-                    cv2.circle(
-                        image, (int(x), int(y)), diameter, CocoColors[j], -1
-                    )
+                if keypoints.shape[2] == 3:
+                    x, y, v = keypoints[i, j, :]
+                    if v < 2:
+                        continue
+                if keypoints.shape[2] == 2:
+                    x, y = keypoints[i, j, :]
+                cv2.circle(
+                    image, (int(x), int(y)), diameter, CocoColors[j], -1
+                )
     return image

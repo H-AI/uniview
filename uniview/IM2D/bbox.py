@@ -162,7 +162,7 @@ class UnviewBBox(object):
             )
         if not min(imsize) > 1.0:
             raise ValueError("[im2d.bbox.UniviewBBox] Image size error!")
-        if isinstance(bbox, list) and not isinstance(bbox[0], list):
+        if isinstance(bbox, list) and not isinstance(bbox[0], (list, tuple)):
             bbox = [bbox]
         if not isinstance(bbox, np.ndarray):
             bbox = np.array(bbox)
