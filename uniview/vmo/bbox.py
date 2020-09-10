@@ -103,7 +103,7 @@ def yolo2albu(
     return boxes_new
 
 
-class UnviewBBox(object):
+class UniviewBBox(object):
     """ Uniview bounding box uses Albumentation bounding box format.
         This class convert bounding boxes objects to albu format.
         The folliwng formats are considered:

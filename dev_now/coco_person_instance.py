@@ -8,7 +8,7 @@ sys.path.append(str(proj_root))
 import cv2
 import json
 
-from uniview.IM2D.bbox import UnviewBBox
+from uniview.IM2D.bbox import UniviewBBox
 from uniview.IM2D import coco_person as cp
 
 
@@ -27,7 +27,7 @@ def main(_argv):
     ['segmentation', 'num_keypoints', 'area', 'iscrowd', 'keypoints',
      'image_id', 'bbox', 'category_id', 'id'] """
 
-    unibox = UnviewBBox()
+    unibox = UniviewBBox()
 
     for imf, annotations in mini_coco.items():
         print(f"---------- {imf} ------------")

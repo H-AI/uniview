@@ -5,7 +5,7 @@ from pathlib import Path
 proj_root = Path(__file__).parent.parent.absolute()
 sys.path.append(str(proj_root))
 
-from uniview.IM2D.bbox import UnviewBBox
+from uniview.IM2D.bbox import UniviewBBox
 
 
 def main(_argv):
@@ -22,7 +22,7 @@ def main(_argv):
 
     imshape = (100, 200)  # (height, width, detph)
 
-    unibox = UnviewBBox(need_trim=True)
+    unibox = UniviewBBox(need_trim=True)
     nbb = unibox.get_albu_bbox(bboxes, boxformat, imshape)
     print(nbb)
 
