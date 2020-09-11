@@ -189,7 +189,10 @@ def coco13_2_torso(coco_kps: Union[list, np.ndarray]) -> np.ndarray:
     return np.array(pt4_joint_list)
 
 
-KPS_CONVERSIONS = {
+SUPPORTED_FORMATS = ["coco", "coco13", "vmo", "torso"]
+
+
+CONVERSIONS_Registry = {
     "coco-openpose": coco_2_openpose,
     "coco-vmo": coco_2_vmo,
     "coco13-vmo": coco13_2_vmo,
