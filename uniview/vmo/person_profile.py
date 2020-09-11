@@ -11,6 +11,8 @@ import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 import PIL.ImageFont as ImageFont
 
+from .keypoints import keypoint_array
+
 try:
     FONT = ImageFont.truetype("arial.ttf", 24)
 except IOError:
@@ -267,9 +269,7 @@ def vis_keypoints(
         np.ndarray
     """
     image = image.copy()
-    keypoints = np.array(keypoints)
-    if len(keypoints.shape) == 2 and keypoints.shape[1] % 3 == 0:
-        keypoints = keypoints.reshape((keypoints.shape[0], -1, 3))
+    keypoints = keypoint_array(keypoints)
     if len(keypoints.shape) == 3:
         n_inst, n_kps, _ = keypoints.shape
         for i in range(n_inst):

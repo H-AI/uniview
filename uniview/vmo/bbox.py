@@ -16,7 +16,7 @@ def yolo2coco(
         box: shape of `[num_box, 4]`. The 4 box ratios of format cx, cy, w, h
     Returns:
         shape of `[num_box, 4]`. The 4 box coordinates of format x1, y1, w, h
-        If trum==True,  Any negative value will be cliped to 0.
+        If trim == True,  Any negative value will be cliped to 0.
                         Width will be limited to inside boundary.
                         Height will be limited to inside boundary.
     """
@@ -48,7 +48,7 @@ def coco2albu(
     Returns:
         shape of `[num_box, 4]`. The box of format [x1, y1, x2, y2]
         in ratios.
-        If trum==True,  Any negative value will be cliped to 0.
+        If trim==True,  Any negative value will be cliped to 0.
                         Any out of bound value will be clipped to boundary-1
     """
     if not min(imsize) > 1.0:
@@ -78,7 +78,7 @@ def yolo2albu(
     Returns:
         shape of `[num_box, 4]`. The box of format [x1, y1, x2, y2]
         in ratios.
-        If trum==True,  Any negative value will be cliped to 0.
+        If trim==True,  Any negative value will be cliped to 0.
                         Any out of bound value will be clipped to boundary-1
     """
     boxes_new = boxes.copy()
