@@ -10,8 +10,11 @@ import numpy as np
 import PIL.Image as Image
 import PIL.ImageDraw as ImageDraw
 import PIL.ImageFont as ImageFont
+from dataclasses import dataclass
 
 from .keypoints import keypoint_array
+from .constants import vmo_skeleton, torso_skeleton
+from .bbox import UniviewBBox
 
 try:
     FONT = ImageFont.truetype("arial.ttf", 24)
@@ -251,8 +254,11 @@ def draw_masks(
 
 
 def vis_keypoints(
-    image: np.ndarray, keypoints: Union[list, np.ndarray], diameter: int = 5
-):
+    image: np.ndarray,
+    keypoints: Union[list, np.ndarray],
+    diameter: int = 5,
+    show_label: bool = True,
+) -> np.ndarray:
     """ Draw person keypoints. Only valid and visible keypoints will be shown
     Args:
         image: numpy array image, shape should be (height, width, channel)
@@ -265,6 +271,7 @@ def vis_keypoints(
                    4). list of ndarray of shape [n_keypoints, 3]
                    5). list of list of tuples in (x, y)
         diameter: radius of keypoint circle
+        show_label: mark keypoint label next to joint
     Returns:
         np.ndarray
     """
@@ -280,7 +287,112 @@ def vis_keypoints(
                         continue
                 if keypoints.shape[2] == 2:
                     x, y = keypoints[i, j, :]
+                    if x < 0 or y < 0:
+                        continue
                 cv2.circle(
                     image, (int(x), int(y)), diameter, CocoColors[j], -1
                 )
+                if show_label:
+                    cv2.putText(
+                        image,
+                        str(j),
+                        (int(x) + 5, int(y)),
+                        cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                        0.7,
+                        (255, 255, 255),
+                    )
     return image
+
+
+def viz_vmo_annotation(
+    image: np.ndarray,
+    bboxes: Union[list, np.ndarray] = None,
+    keypoints: Union[list, np.ndarray] = None,
+    labels: Union[list, np.ndarray] = None,
+    box_format: str = "albu",
+    resize: float = 1.0,
+) -> np.ndarray:
+    """Visualize vmo example data with person annotations
+
+    Args:
+        image: np.ndarray, image data in RGB format
+        box_format: one of ['coco', 'yolo', 'albu']
+        bboxes: list or np.ndarray
+        categories: np.ndarray,
+        keypoints: np.ndarray,
+        r_resize: if not equals to 1.0, resize image to target ratio
+
+    Retruns:
+        display image
+    """
+    im = np.copy(image[:, :, ::-1])
+    if bboxes is not None:
+        if not box_format == "albu":
+            bboxes = UniviewBBox().get_albu_bbox(bboxes, box_format, im.shape)
+        im = draw_boxes(im, bboxes, labels)
+        im = vis_keypoints(im, keypoints)
+    if resize != 1.0:
+        im = cv2.resize(im, (0, 0), fx=resize, fy=resize)
+    return im
+
+
+def viz_vmo_pose(
+    vmo_example: dataclass, show_box: bool = True, r_resize: float = 1.0
+) -> np.ndarray:
+    """Visualize vmo example data with person skeletions
+
+    Args:
+        vmo_example: a dataclass object that has the following
+        necessary fields:
+        - imdata: np.ndarray, image data in RGB format
+        - bboxes: np.ndarray, bounding boxes in albumentation format
+        - categories: np.ndarray,
+        - keypoints: np.ndarray,
+        - keypoint_format: str, keypoint format in ['vmo', 'torso']
+        show_box: if True, display bounding box and category label
+        r_resize: if not equals to 1.0, resize image to target ratio
+
+    Retruns:
+        display image
+    """
+    if vmo_example.keypoint_format not in ["vmo", "torso"]:
+        raise Exception("//Error: please provide valid vmo keypoint format!")
+    if vmo_example.keypoint_format == "vmo":
+        _skeleton = vmo_skeleton
+    elif vmo_example.keypoint_format == "torso":
+        _skeleton = torso_skeleton
+    else:
+        raise Exception("//Error: undefined skeleton format!")
+
+    imdsp = np.copy(vmo_example.imdata[:, :, ::-1])
+    if show_box:
+        imdsp = draw_boxes(imdsp, vmo_example.bboxes, vmo_example.categories)
+    imdsp = vis_keypoints(imdsp, vmo_example.keypoints)
+
+    kps_foramt = None
+    if vmo_example.keypoints.shape[2] == 3:
+        kps_foramt = "xyv"
+    elif vmo_example.keypoints.shape[2] == 2:
+        kps_foramt = "xy"
+    else:
+        raise Exception("//Error: unknown keypoint format!")
+    for _inst in vmo_example.keypoints:
+        for p, q in _skeleton:
+            if kps_foramt == "xyv":
+                x0, y0, v0 = _inst[p]
+                x1, y1, v1 = _inst[q]
+                if v0 < 2 or v1 < 2:
+                    continue
+            if kps_foramt == "xy":
+                x0, y0 = _inst[p]
+                x1, y1 = _inst[q]
+                if x0 < 0 or y0 < 0 or x1 < 0 or y1 < 0:
+                    continue
+            cv2.line(
+                imdsp, (int(x0), int(y0)), (int(x1), int(y1)), CocoColors[p], 2
+            )
+
+    if r_resize != 1.0:
+        imdsp = cv2.resize(imdsp, (0, 0), fx=r_resize, fy=r_resize)
+
+    return imdsp
