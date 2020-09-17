@@ -26,10 +26,11 @@ def keypoint_array(keypoints: Union[list, np.ndarray]) -> np.ndarray:
         the 3 keypoint data are (x, y, v) with v for quality value.
     """
     keypoints = np.array(keypoints)
-    if len(keypoints.shape) not in [2, 3]:
-        raise Exception("// Error: keypoint data in wrong data shape!")
-    if len(keypoints.shape) == 2 and keypoints.shape[1] % 3 == 0:
-        keypoints = keypoints.reshape((keypoints.shape[0], -1, 3))
+    if keypoints.shape[0] > 0:
+        if len(keypoints.shape) not in [2, 3]:
+            raise Exception("// Error: keypoint data in wrong data shape!")
+        if len(keypoints.shape) == 2 and keypoints.shape[1] % 3 == 0:
+            keypoints = keypoints.reshape((keypoints.shape[0], -1, 3))
     return keypoints
 
 

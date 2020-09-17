@@ -134,8 +134,9 @@ def draw_boxes(
     """
     imh, imw, _ = image.shape
     boxes = np.array(boxes)
-    boxes *= np.array([imw, imh, imw, imh])
     num_boxes = boxes.shape[0]
+    if num_boxes > 0:
+        boxes *= np.array([imw, imh, imw, imh])
     if isinstance(image, Image.Image):
         draw_image = image
     elif isinstance(image, np.ndarray):
@@ -277,7 +278,7 @@ def vis_keypoints(
     """
     image = image.copy()
     keypoints = keypoint_array(keypoints)
-    if len(keypoints.shape) == 3:
+    if keypoints.shape[0] > 0 and len(keypoints.shape) == 3:
         n_inst, n_kps, _ = keypoints.shape
         for i in range(n_inst):
             for j in range(n_kps):
@@ -370,12 +371,13 @@ def viz_vmo_pose(
     imdsp = vis_keypoints(imdsp, vmo_example.keypoints)
 
     kps_foramt = None
-    if vmo_example.keypoints.shape[2] == 3:
-        kps_foramt = "xyv"
-    elif vmo_example.keypoints.shape[2] == 2:
-        kps_foramt = "xy"
-    else:
-        raise Exception("//Error: unknown keypoint format!")
+    if vmo_example.keypoints.shape[0] > 0:
+        if vmo_example.keypoints.shape[2] == 3:
+            kps_foramt = "xyv"
+        elif vmo_example.keypoints.shape[2] == 2:
+            kps_foramt = "xy"
+        else:
+            raise Exception("//Error: unknown keypoint format!")
     for _inst in vmo_example.keypoints:
         for p, q in _skeleton:
             if kps_foramt == "xyv":
