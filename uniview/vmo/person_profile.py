@@ -13,7 +13,7 @@ import PIL.ImageFont as ImageFont
 from dataclasses import dataclass
 
 from .keypoints import keypoint_array
-from .constants import vmo_skeleton, torso_skeleton
+from . import constants as vmoc
 from .bbox import UniviewBBox
 
 try:
@@ -358,9 +358,9 @@ def viz_vmo_pose(
     if vmo_example.keypoint_format not in ["vmo", "torso"]:
         raise Exception("//Error: please provide valid vmo keypoint format!")
     if vmo_example.keypoint_format == "vmo":
-        _skeleton = vmo_skeleton
+        _skeleton = vmoc.vmo_skeleton
     elif vmo_example.keypoint_format == "torso":
-        _skeleton = torso_skeleton
+        _skeleton = vmoc.torso_skeleton
     else:
         raise Exception("//Error: undefined skeleton format!")
 
@@ -396,3 +396,74 @@ def viz_vmo_pose(
         imdsp = cv2.resize(imdsp, (0, 0), fx=r_resize, fy=r_resize)
 
     return imdsp
+
+
+def draw_humans(
+    img: np.ndarray, human_list: list, joint_format: str = "torso"
+) -> np.ndarray:
+    """Draw human pose skeleton
+    Using torse skeleton as example, each human in the data structure
+    of human_list is like:
+    defaultdict {
+        0: (0, (0.14375, 0.42990654205607476), 1.0),
+        1: (1, (0.10625, 0.48598130841121495), 1.0),
+        2: (2, (0.13125, 0.48598130841121495), 1.0),
+        3: (3, (0.1, 0.616822429906542), 1.0)
+    }
+    """
+    if "vmo" in joint_format:
+        nr_keypoints = vmoc.nr_vmo_keypoints
+        if joint_format == "vmo":
+            _Pairs = vmoc.vmopose_vecs
+        elif joint_format == "vmo16":
+            _Pairs = vmoc.vmopose16_vecs
+    elif joint_format == "torso":
+        nr_keypoints = vmoc.nr_torso_keypoints
+        _Pairs = vmoc.torsopose_vecs
+    else:
+        print("-- Undefined pose data format!")
+
+    img_copied = np.copy(img)
+    image_h, image_w = img_copied.shape[:2]
+    centers = {}
+
+    radius = 2
+    cthickness = 3
+    lthickness = 2
+
+    for human in human_list:
+        part_idxs = human.keys()
+
+        # draw point
+        for i in range(nr_keypoints):
+            if i not in part_idxs:
+                continue
+            part_coord = human[i][1]
+            center = (
+                int(part_coord[0] * image_w + 0.5),
+                int(part_coord[1] * image_h + 0.5),
+            )
+            centers[i] = center
+            cv2.circle(
+                img_copied,
+                center,
+                radius,
+                CocoColors[i],
+                thickness=cthickness,
+                lineType=8,
+                shift=0,
+            )
+
+        # draw line
+        for pair_order, pair in enumerate(_Pairs):
+            if pair[0] not in part_idxs or pair[1] not in part_idxs:
+                continue
+            img_copied = cv2.line(
+                img_copied,
+                centers[pair[0]],
+                centers[pair[1]],
+                CocoColors[pair_order],
+                lthickness,
+            )
+
+    return img_copied
