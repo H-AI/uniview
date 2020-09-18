@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "uniview"
-version = "0.1.0"
+version = "0.1.1"
 description = "Datapoint Visualization and Illustration Toolkit"
 authors = ["H-AI <dongjian413@gmail.com>"]
 maintainers = ["H-AI <dongjian413@gmail.com>"]
