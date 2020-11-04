@@ -8,8 +8,8 @@ sys.path.append(str(proj_root))
 import cv2
 import json
 
-from subtrees.uniview.uniview.IM2D.bbox import UniviewBBox
-from subtrees.uniview.uniview.IM2D import coco_person as cp
+from uniview.IM2D.bbox import UniviewBBox
+from uniview.IM2D import coco_person as cp
 
 
 def main(_argv):
