@@ -469,3 +469,79 @@ def draw_humans(
             )
 
     return img_copied
+
+
+def draw_est_humans(
+    img: np.ndarray,
+    humans: dict,
+    joint_format: str = "torso",
+    one_by_one: bool = False,
+) -> np.ndarray:
+    """Draw human pose skeleton
+    Args:
+    img: image to draw skeletons onto
+    humans: dict of human instances. The dict keys are integer inst indices
+        for example:
+        {0:
+        {
+            'bbox': array([224.2,  37.6, 411.7, 462.3, 0.8], dtype=float32),
+            'joints': [
+                (269.0, 83.0, 0.8299453258514404, -0.08062278479337692),...
+            ]
+        }
+        bbox format: (x0, y0, x1, y1, score)
+        joint format: (x, y, score, tag) for n_joints elements
+    joint_format: <"vmo", "torso">
+    """
+    if "vmo" in joint_format:
+        if joint_format == "vmo":
+            _Pairs = vmoc.vmopose_vecs
+        elif joint_format == "vmo16":
+            _Pairs = vmoc.vmopose16_vecs
+    elif joint_format == "torso":
+        _Pairs = vmoc.torsopose_vecs
+    else:
+        print("-- Undefined pose data format!")
+
+    demos = []
+    img_copied = np.copy(img)
+    for human in humans.values():
+        x0, y0, x1, y1 = human["bbox"][:4].astype(int)
+        cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
+        joints = human["joints"]
+
+        # draw joints
+        for k, v in joints.items():
+            x, y = v
+            center = (int(x + 0.5), int(y + 0.5))
+            cv2.circle(
+                img_copied,
+                center,
+                radius=2,
+                color=CocoColors[k],
+                thickness=3,
+                lineType=8,
+                shift=0,
+            )
+
+        # draw limb
+        for pair_order, pair in enumerate(_Pairs):
+            p1, p2 = pair
+            if not (p1 in joints and p2 in joints):
+                continue
+            center_1 = (int(joints[p1][0] + 0.5), int(joints[p1][1] + 0.5))
+            center_2 = (int(joints[p2][0] + 0.5), int(joints[p2][1] + 0.5))
+            img_copied = cv2.line(
+                img_copied,
+                center_1,
+                center_2,
+                CocoColors[pair_order],
+                thickness=2,
+            )
+        if one_by_one:
+            demos.append(img_copied)
+            img_copied = np.copy(img)
+
+    if one_by_one:
+        return demos
+    return img_copied
