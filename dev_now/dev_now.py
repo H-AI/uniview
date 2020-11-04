@@ -5,7 +5,7 @@ from pathlib import Path
 proj_root = Path(__file__).parent.parent.absolute()
 sys.path.append(str(proj_root))
 
-from uniview.IM2D.bbox import UniviewBBox
+from subtrees.uniview.uniview.IM2D.bbox import UniviewBBox
 
 
 def main(_argv):

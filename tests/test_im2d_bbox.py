@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from uniview.vmo.bbox import yolo2coco, coco2albu, yolo2albu
+from subtrees.uniview.uniview.vmo.bbox import yolo2coco, coco2albu, yolo2albu
 
 
 def test_yolo2coco():
