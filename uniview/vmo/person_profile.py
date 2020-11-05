@@ -512,7 +512,7 @@ def draw_est_humans(
 
         # draw joints
         for k, v in joints.items():
-            x, y = v
+            x, y = v[:2]
             center = (int(x + 0.5), int(y + 0.5))
             cv2.circle(
                 img_copied,
