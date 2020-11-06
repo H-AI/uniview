@@ -477,6 +477,7 @@ def draw_est_humans(
     joint_format: str = "torso",
     one_by_one: bool = False,
     show_bbox: bool = True,
+    show_score: bool = True,
     demo_mode: bool = False,
 ) -> np.ndarray:
     """Draw human pose skeleton
@@ -514,7 +515,23 @@ def draw_est_humans(
         joints = human["joints"]
         if show_bbox:
             x0, y0, x1, y1 = human["bbox"][:4].astype(int)
+            score = human["bbox"][4]
+            cx, cy = human["bbox"][5:].astype(int)
             cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
+            cv2.circle(img_copied, (cx, cy), 5, (0, 250, 250), 2)
+            cv2.circle(img_copied, (cx, cy), 1, (0, 0, 250), -1)
+            if show_score:
+                cv2.rectangle(
+                    img_copied, (x0, y0), (x0 + 40, y0 + 20), (0, 255, 255), -1
+                )
+                cv2.putText(
+                    img_copied,
+                    f"{score:.2f}",
+                    (x0 + 5, y0 + 15),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    0.7,
+                    (0, 0, 0),
+                )
 
         # draw limb
         for pair_order, pair in enumerate(_Pairs):
@@ -524,7 +541,9 @@ def draw_est_humans(
             center_1 = (int(joints[p1][0] + 0.5), int(joints[p1][1] + 0.5))
             center_2 = (int(joints[p2][0] + 0.5), int(joints[p2][1] + 0.5))
             if demo_mode:
-                img_copied = cv2.line(img_copied, center_1, center_2, (255,0,0), 2)
+                img_copied = cv2.line(
+                    img_copied, center_1, center_2, (255, 0, 0), 2
+                )
             else:
                 img_copied = cv2.line(
                     img_copied,
@@ -543,8 +562,8 @@ def draw_est_humans(
                     cs, cl = 4, 6
                 else:
                     cs, cl = 2, 4
-                cv2.circle(img_copied, center, cl, (0,0,0), 1)
-                cv2.circle(img_copied, center, cs, (0,0,250), 2)
+                cv2.circle(img_copied, center, cl, (0, 0, 0), 1)
+                cv2.circle(img_copied, center, cs, (0, 0, 250), 2)
             else:
                 cv2.circle(
                     img_copied,
