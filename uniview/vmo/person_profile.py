@@ -563,3 +563,33 @@ def draw_est_humans(
     if one_by_one:
         return demos
     return img_copied
+
+
+def viz_ae_tag(
+    image: np.ndarray, tag: np.ndarray, mode: str = "color"
+) -> np.ndarray:
+    tagim = tag.copy()
+    amin, amax = tagim.min(), tagim.max()
+    arange = amax - amin
+
+    if mode != "color":
+        imfloat = (tagim - amin) / arange * 255
+        imint = np.clip(imfloat, 0, 255)
+        return imint.astype(np.uint8), None
+
+    tagim = (tagim - amin) / arange * 767
+    blue = np.ma.masked_where(255 < tagim, tagim)
+    blue = np.ma.MaskedArray(tagim, blue.mask).astype(np.uint8)
+    blue = blue.filled(fill_value=0)
+    green = np.ma.masked_where((511 < tagim) | (tagim <= 255), tagim)
+    green = np.ma.MaskedArray(tagim, green.mask) - 255
+    green = green.filled(fill_value=0).astype(np.uint8)
+    red = np.ma.masked_where(tagim <= 512, tagim)
+    red = np.ma.MaskedArray(tagim, red.mask) - 511
+    red = red.filled(fill_value=0).astype(np.uint8)
+    tag_dsp = np.stack((blue, green, red), axis=2)
+
+    tag_add = cv2.resize(tag_dsp, (0, 0), fx=2.0, fy=2.0)
+    tag_im = cv2.addWeighted(image, 0.6, tag_add, 0.4, 0)
+
+    return tag_dsp, tag_im
