@@ -476,6 +476,8 @@ def draw_est_humans(
     humans: dict,
     joint_format: str = "torso",
     one_by_one: bool = False,
+    show_bbox: bool = True,
+    demo_mode: bool = False,
 ) -> np.ndarray:
     """Draw human pose skeleton
     Args:
@@ -492,6 +494,9 @@ def draw_est_humans(
         bbox format: (x0, y0, x1, y1, score)
         joint format: (x, y, score, tag) for n_joints elements
     joint_format: <"vmo", "torso">
+    one_by_one: bool, display instances, each in an image
+    show_bbox: bool, if Ture, display bounding box
+    demo_mode: bool, if Ture, display joints in demo color scheme
     """
     if "vmo" in joint_format:
         if joint_format == "vmo":
@@ -506,23 +511,10 @@ def draw_est_humans(
     demos = []
     img_copied = np.copy(img)
     for human in humans.values():
-        x0, y0, x1, y1 = human["bbox"][:4].astype(int)
-        cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
         joints = human["joints"]
-
-        # draw joints
-        for k, v in joints.items():
-            x, y = v[:2]
-            center = (int(x + 0.5), int(y + 0.5))
-            cv2.circle(
-                img_copied,
-                center,
-                radius=2,
-                color=CocoColors[k],
-                thickness=3,
-                lineType=8,
-                shift=0,
-            )
+        if show_bbox:
+            x0, y0, x1, y1 = human["bbox"][:4].astype(int)
+            cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
 
         # draw limb
         for pair_order, pair in enumerate(_Pairs):
@@ -531,13 +523,39 @@ def draw_est_humans(
                 continue
             center_1 = (int(joints[p1][0] + 0.5), int(joints[p1][1] + 0.5))
             center_2 = (int(joints[p2][0] + 0.5), int(joints[p2][1] + 0.5))
-            img_copied = cv2.line(
-                img_copied,
-                center_1,
-                center_2,
-                CocoColors[pair_order],
-                thickness=2,
-            )
+            if demo_mode:
+                img_copied = cv2.line(img_copied, center_1, center_2, (255,0,0), 2)
+            else:
+                img_copied = cv2.line(
+                    img_copied,
+                    center_1,
+                    center_2,
+                    CocoColors[pair_order],
+                    thickness=2,
+                )
+
+        # draw joints
+        for k, v in joints.items():
+            x, y = v[:2]
+            center = (int(x + 0.5), int(y + 0.5))
+            if demo_mode:
+                if k == 0:
+                    cs, cl = 4, 6
+                else:
+                    cs, cl = 2, 4
+                cv2.circle(img_copied, center, cl, (0,0,0), 1)
+                cv2.circle(img_copied, center, cs, (0,0,250), 2)
+            else:
+                cv2.circle(
+                    img_copied,
+                    center,
+                    radius=2,
+                    color=CocoColors[k],
+                    thickness=3,
+                    lineType=8,
+                    shift=0,
+                )
+
         if one_by_one:
             demos.append(img_copied)
             img_copied = np.copy(img)
