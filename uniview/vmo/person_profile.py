@@ -511,27 +511,8 @@ def draw_est_humans(
 
     demos = []
     img_copied = np.copy(img)
-    for human in humans.values():
+    for hi, human in humans.items():
         joints = human["joints"]
-        if show_bbox:
-            x0, y0, x1, y1 = human["bbox"][:4].astype(int)
-            score = human["bbox"][4]
-            cx, cy = human["bbox"][5:].astype(int)
-            cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
-            cv2.circle(img_copied, (cx, cy), 5, (0, 250, 250), 2)
-            cv2.circle(img_copied, (cx, cy), 1, (0, 0, 250), -1)
-            if show_score:
-                cv2.rectangle(
-                    img_copied, (x0, y0), (x0 + 40, y0 + 20), (0, 255, 255), -1
-                )
-                cv2.putText(
-                    img_copied,
-                    f"{score:.2f}",
-                    (x0 + 5, y0 + 15),
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    0.7,
-                    (0, 0, 0),
-                )
 
         # draw limb
         for pair_order, pair in enumerate(_Pairs):
@@ -573,6 +554,34 @@ def draw_est_humans(
                     thickness=3,
                     lineType=8,
                     shift=0,
+                )
+
+        if show_bbox:
+            x0, y0, x1, y1 = human["bbox"][:4].astype(int)
+            score = human["bbox"][4]
+            cx, cy = human["bbox"][5:].astype(int)
+            cv2.rectangle(img_copied, (x0, y0), (x1, y1), (0, 255, 255), 2)
+            cv2.circle(img_copied, (cx, cy), 8, (0, 0, 250), 2)
+            cv2.circle(img_copied, (cx, cy), 5, (250, 250, 250), -1)
+            cv2.putText(
+                    img_copied,
+                    f"{hi}",
+                    (cx-3, cy+3),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    0.5,
+                    (0, 0, 0),
+                )
+            if show_score:
+                cv2.rectangle(
+                    img_copied, (x0, y0), (x0 + 40, y0 + 20), (0, 255, 255), -1
+                )
+                cv2.putText(
+                    img_copied,
+                    f"{score:.2f}",
+                    (x0 + 5, y0 + 15),
+                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                    0.7,
+                    (0, 0, 0),
                 )
 
         if one_by_one:
