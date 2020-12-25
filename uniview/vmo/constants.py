@@ -154,6 +154,26 @@ vmo_flip_list = [
     VmoPart.RKnee,
     VmoPart.RAnkle,
 ]
+"""
+0: BACKGROUND; 1: HEAD; 2: RIGHT ARM; 3: LEFT ARM; 4: RIGHT LEG; 5: LEFT LEG
+"""
+vmo_joint_bodypart = [
+    (0, 1),
+    (1, 1),
+    (2, 2),
+    (3, 2),
+    (4, 2),
+    (5, 3),
+    (6, 3),
+    (7, 3),
+    (8, 4),
+    (9, 4),
+    (10, 4),
+    (11, 5),
+    (12, 5),
+    (13, 5),
+]
+
 # fmt: off
 nr_vmo_links = 14
 vmopose_vecs = list(
