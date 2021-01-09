@@ -594,7 +594,7 @@ def draw_est_humans(
 
 
 def viz_ae_tag(
-    image: np.ndarray, tag: np.ndarray, mode: str = "color"
+    image: np.ndarray, tag: np.ndarray, mode: str = "color", scale_factor: int=2.0
 ) -> np.ndarray:
     tagim = tag.copy()
     amin, amax = tagim.min(), tagim.max()
@@ -617,7 +617,7 @@ def viz_ae_tag(
     red = red.filled(fill_value=0).astype(np.uint8)
     tag_dsp = np.stack((blue, green, red), axis=2)
 
-    tag_add = cv2.resize(tag_dsp, (0, 0), fx=2.0, fy=2.0)
+    tag_add = cv2.resize(tag_dsp, (0, 0), fx=scale_factor, fy=scale_factor)
     tag_im = cv2.addWeighted(image, 0.6, tag_add, 0.4, 0)
 
     return tag_dsp, tag_im
