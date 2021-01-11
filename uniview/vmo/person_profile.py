@@ -621,3 +621,21 @@ def viz_ae_tag(
     tag_im = cv2.addWeighted(image, 0.6, tag_add, 0.4, 0)
 
     return tag_dsp, tag_im
+
+
+def viz_ae_tag2(
+    image: np.ndarray, tag: np.ndarray, mode: str = "color", scale_factor: int=2.0
+) -> np.ndarray:
+    """This version use colormap to demo values. In comparison, it has more
+       colored regions, but less sharp edge than version-I.
+    """
+    tagim = tag.copy()
+    amin, amax = tagim.min(), tagim.max()
+    arange = amax - amin
+    imfloat = (tagim - amin) / arange * 255
+    imint = np.clip(imfloat, 0, 255)
+    tag_dsp = cv2.applyColorMap(imint.astype(np.uint8), cv2.COLORMAP_JET)
+    tag_add = cv2.resize(tag_dsp, (0, 0), fx=scale_factor, fy=scale_factor)
+    tag_im = cv2.addWeighted(image, 0.6, tag_add, 0.4, 0)
+
+    return tag_dsp, tag_im
