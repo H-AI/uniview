@@ -47,7 +47,7 @@ CocoColors = [
 
 
 def compute_color_for_labels(label):
-    """ palette by class label """
+    """palette by class label"""
     color = [int((p * (label ** 2 - label + 1)) % 255) for p in palette]
     return tuple(color)
 
@@ -260,7 +260,7 @@ def vis_keypoints(
     diameter: int = 5,
     show_label: bool = True,
 ) -> np.ndarray:
-    """ Draw person keypoints. Only valid and visible keypoints will be shown
+    """Draw person keypoints. Only valid and visible keypoints will be shown
     Args:
         image: numpy array image, shape should be (height, width, channel)
         keypoints: The keypoints input can be in many different formats:
@@ -564,13 +564,13 @@ def draw_est_humans(
             cv2.circle(img_copied, (cx, cy), 8, (0, 0, 250), 2)
             cv2.circle(img_copied, (cx, cy), 5, (250, 250, 250), -1)
             cv2.putText(
-                    img_copied,
-                    f"{hi}",
-                    (cx-3, cy+3),
-                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                    0.5,
-                    (0, 0, 0),
-                )
+                img_copied,
+                f"{hi}",
+                (cx - 3, cy + 3),
+                cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                0.5,
+                (0, 0, 0),
+            )
             if show_score:
                 cv2.rectangle(
                     img_copied, (x0, y0), (x0 + 40, y0 + 20), (0, 255, 255), -1
@@ -594,7 +594,10 @@ def draw_est_humans(
 
 
 def viz_ae_tag(
-    image: np.ndarray, tag: np.ndarray, mode: str = "color", scale_factor: int=2.0
+    image: np.ndarray,
+    tag: np.ndarray,
+    mode: str = "color",
+    scale_factor: int = 2.0,
 ) -> np.ndarray:
     tagim = tag.copy()
     amin, amax = tagim.min(), tagim.max()
@@ -624,10 +627,13 @@ def viz_ae_tag(
 
 
 def viz_ae_tag2(
-    image: np.ndarray, tag: np.ndarray, mode: str = "color", scale_factor: int=2.0
+    image: np.ndarray,
+    tag: np.ndarray,
+    mode: str = "color",
+    scale_factor: int = 2.0,
 ) -> np.ndarray:
     """This version use colormap to demo values. In comparison, it has more
-       colored regions, but less sharp edge than version-I.
+    colored regions, but less sharp edge than version-I.
     """
     tagim = tag.copy()
     amin, amax = tagim.min(), tagim.max()
