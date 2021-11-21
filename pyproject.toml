@@ -15,10 +15,11 @@ keywords = ["IICO",
             "Augmentation"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 absl-py = "^0.13.0"
 opencv-python = "^4.5.3"
 Pillow = "^8.3.1"
+pandas = "^1.3.4"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -27,6 +28,13 @@ black = "^19.10b0"
 pytest-cov = "^2.10.1"
 mypy = "^0.782"
 pre-commit = "^2.13.0"
+dash = "^2.0.0"
+dash-html-components = "^2.0.0"
+dash-core-components = "^2.0.0"
+plotly = "^5.4.0"
+jupyter-dash = "^0.4.0"
+ipykernel = "^6.5.1"
+nbformat = "^5.1.3"
 
 [tool.black]
 line-length = 79
